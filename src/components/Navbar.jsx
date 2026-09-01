@@ -1,57 +1,116 @@
-import { AppBar, Toolbar, Button, Typography } from "@mui/material";
-import { Link } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Button,
+  Typography,
+} from "@mui/material";
+
+import { Link, useNavigate } from "react-router-dom";
+import { useContext } from "react";
+
+import AuthContext from "../context/AuthContext";
 
 function Navbar() {
-    return (
-        <AppBar position="static">
-            <Toolbar>
+  const { user, logout } = useContext(AuthContext);
+  const navigate = useNavigate();
 
-                <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                    ShopSphere
-                </Typography>
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
 
-                <Button
-                    variant="contained"
-                    component={Link}
-                    to="/"
-                >
-                    Home
-                </Button>
+  return (
+    <AppBar position="static">
+      <Toolbar>
 
-                <Button
-                    variant="contained"
-                    component={Link}
-                    to="/products"
-                >
-                    Products
-                </Button>
+        <Typography
+          variant="h6"
+          sx={{ flexGrow: 1 }}
+        >
+          ShopSphere
+        </Typography>
 
-                <Button
-                    variant="contained"
-                    component={Link}
-                    to="/cart"
-                >
-                    Cart
-                </Button>
+        <Button
+          color="inherit"
+          component={Link}
+          to="/"
+        >
+          Home
+        </Button>
 
-                <Button
-                    variant="contained"
-                    component={Link}
-                    to="/wishlist"
-                >
-                    Wishlist
-                </Button>
+        <Button
+          color="inherit"
+          component={Link}
+          to="/products"
+        >
+          Products
+        </Button>
 
-                <Button
-                    variant="contained"
-                    component={Link}
-                    to="/login"
-                >
-                    Login
-                </Button>
-            </Toolbar>
-        </AppBar>
-    );
+        <Button
+          color="inherit"
+          component={Link}
+          to="/cart"
+        >
+          Cart
+        </Button>
+
+        <Button
+          color="inherit"
+          component={Link}
+          to="/wishlist"
+        >
+          Wishlist
+        </Button>
+
+        {user ? (
+          <>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/my-orders"
+            >
+              My Orders
+            </Button>
+
+            <Typography
+              sx={{
+                mx: 2,
+                fontSize: "0.9rem",
+              }}
+            >
+              Hi, {user.name}
+            </Typography>
+
+            <Button
+              color="inherit"
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              color="inherit"
+              component={Link}
+              to="/login"
+            >
+              Login
+            </Button>
+
+            <Button
+              color="inherit"
+              component={Link}
+              to="/register"
+            >
+              Register
+            </Button>
+          </>
+        )}
+
+      </Toolbar>
+    </AppBar>
+  );
 }
 
 export default Navbar;

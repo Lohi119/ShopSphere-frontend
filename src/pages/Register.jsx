@@ -4,47 +4,40 @@ import {
   Button,
   Typography,
 } from "@mui/material";
+import { useState } from "react";
 
-import { useState, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-
-import AuthContext from "../context/AuthContext";
-
-function Login() {
+function Register() {
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
-
-  const { login } = useContext(AuthContext);
-  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
 
     setError("");
+    setSuccess("");
 
-    if (!email || !password) {
-      setError("Please enter email and password");
+    if (!name || !email || !password) {
+      setError("Please fill all fields");
       return;
     }
 
     setLoading(true);
 
     try {
-      // ==============================
-      // STEP 1: LOGIN
-      // ==============================
-
       const response = await fetch(
-        "http://localhost:8081/api/auth/login",
+        "http://localhost:8081/api/auth/register",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
+            name,
             email,
             password,
           }),
@@ -55,67 +48,25 @@ function Login() {
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Login failed"
+          data.message || "Registration failed"
         );
       }
 
-      console.log("Login successful:", data);
+      console.log("Registration successful:", data);
 
-      // ==============================
-      // STEP 2: GET USER DETAILS
-      // ==============================
+      setSuccess("Registration successful!");
 
-      const userResponse = await fetch(
-        `http://localhost:8081/api/users/email/${encodeURIComponent(
-          email
-        )}`
-      );
-
-      if (!userResponse.ok) {
-        throw new Error(
-          "Unable to get user details"
-        );
-      }
-
-      const loggedInUser =
-        await userResponse.json();
-
-      console.log(
-        "Logged-in user:",
-        loggedInUser
-      );
-
-      // ==============================
-      // STEP 3: SAVE USER + TOKEN
-      // ==============================
-
-      login(
-        loggedInUser,
-        data.token
-      );
-
-      // ==============================
-      // STEP 4: GO TO HOME
-      // ==============================
-
-      navigate("/");
-
+      setName("");
+      setEmail("");
+      setPassword("");
     } catch (error) {
-
-      console.error(
-        "Login error:",
-        error
-      );
+      console.error("Registration error:", error);
 
       setError(
-        error.message ||
-        "Something went wrong"
+        error.message || "Something went wrong"
       );
-
     } finally {
-
       setLoading(false);
-
     }
   };
 
@@ -128,7 +79,7 @@ function Login() {
         variant="h4"
         sx={{ mb: 3 }}
       >
-        Login
+        Register
       </Typography>
 
       {error && (
@@ -140,7 +91,25 @@ function Login() {
         </Typography>
       )}
 
+      {success && (
+        <Typography
+          color="success.main"
+          sx={{ mb: 2 }}
+        >
+          {success}
+        </Typography>
+      )}
+
       <form onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          label="Name"
+          value={name}
+          onChange={(event) =>
+            setName(event.target.value)
+          }
+          sx={{ mb: 2 }}
+        />
 
         <TextField
           fullWidth
@@ -170,13 +139,12 @@ function Login() {
           disabled={loading}
         >
           {loading
-            ? "Logging in..."
-            : "Login"}
+            ? "Registering..."
+            : "Register"}
         </Button>
-
       </form>
     </Container>
   );
 }
 
-export default Login;
+export default Register;
